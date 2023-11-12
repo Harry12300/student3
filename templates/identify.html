@@ -7,50 +7,113 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
 </head>
+
 <body>
     <button style="margin: 10px;" type="button" class="btn btn-primary" onclick="navigateToAdmin2()">回首頁</button>
 <div class="container">
-  <h1 class="jumbotron bg-primary" style="text-align: center">圖像分類</h1>
-  <br><br>
+  <h1 class="jumbotron bg-primary" style="text-align: center">圖像辨識</h1>
+
   <form class="form-horizontal" action="/submit" method="post" enctype="multipart/form-data">
 
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="pwd">傳到後端進行辨識的圖片:</label>
-      <div class="col-sm-10">
-        <input type="file" class="form-control" placeholder="Hours Studied"  name="my_image" id="pwd">
-      </div>
+<div style="margin-bottom: 10px;">
+  <form method="post" action="/search">
+    <div style="display: inline-block; width: 80%;"> <!-- 調整這裡的寬度百分比 -->
+      <input type="file" class="form-control" placeholder="Hours Studied" name="my_image" id="pwd">
     </div>
-
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
-        <button type="submit" class="btn btn-success">傳送</button>
-      </div>
-    </div>
-
+    <button type="submit" class="btn btn-success">傳送</button>
   </form>
-
-  <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">圖片</th>
-      <th scope="col">名稱</th>
-      <th scope="col">昨日建議價</th>
-      <th scope="col">今日建議價</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th><img src="{{img_path}}" height="100px" width="100px"></th>
-      <td>{{price_name}}</td>
-      <td>{{price_up}}</td>
-      <td>{{price_down}}</td>
-    </tr>
-  </tbody>
-</table>
-
 </div>
+
+
+
+
+
+    {% if img_path %}
+      <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">圖片</th>
+          <th scope="col">名稱</th>
+          <th scope="col">昨日建議價格</th>
+          <th scope="col">今日建議價格</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><img src="{{ img_path }}" height="100px" width="100px"></th>
+          <td>{{ price.name }}</td>
+          <td>{{ price.price_L2 }}</td>
+          <td>{{ price.price_L1 }}</td>
+        </tr>
+      </tbody>
+      </table>
+    <canvas id="myLineChart" width="400" height="200"></canvas>
+
+    {% endif %}
+  </form>
+</div>
+
 <script>
-    function navigateToAdmin2() {
-            window.location.href = "/admin";
-        }</script>
+
+var today = new Date();
+var L1 = (today.getMonth() + 1) + '/' + today.getDate();
+var L2 = (today.getMonth() + 1) + '/' + (today.getDate()-1);
+var L3 = (today.getMonth() + 1) + '/' + (today.getDate()-2);
+var L4 = (today.getMonth() + 1) + '/' + (today.getDate()-3);
+var L5 = (today.getMonth() + 1) + '/' + (today.getDate()-4);
+var L6 = (today.getMonth() + 1) + '/' + (today.getDate()-5);
+var L7 = (today.getMonth() + 1) + '/' + (today.getDate()-6);
+
+var data = {
+    labels: [L7, L6, L5, L4, L3, L2, L1],
+    datasets: [{
+        label: '過去七天價格走勢圖',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        data: [{{ price.price_L7 }}, {{ price.price_L6 }}, {{ price.price_L5 }}, {{ price.price_L4 }},{{ price.price_L3 }}, {{ price.price_L2 }}, {{ price.price_L1 }}]
+    }]
+};
+
+var ctx = document.getElementById('myLineChart').getContext('2d');
+
+var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        scales: {
+            x: {
+                type: 'category',
+                position: 'bottom'
+            },
+            y: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var label = context.dataset.label || '';
+
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += context.parsed.y;
+                        return label;
+                    }
+                }
+            }
+        }
+    }
+});
+
+function navigateToAdmin2() {
+    window.location.href = "/";
+}
+</script>
+
+
+
+</body>
+</html>

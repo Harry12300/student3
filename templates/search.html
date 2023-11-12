@@ -7,73 +7,134 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
 </head>
-
-
 <body>
-    <button style="margin: 10px;" type="button" class="btn btn-primary" onclick="navigateToAdmin2()">回首頁</button>
+  <button style="margin: 10px;" type="button" class="btn btn-primary" onclick="navigateToAdmin2()">回首頁</button>
 
-
-    <div class="container">
-        <h1 class="jumbotron bg-primary" style="text-align: center" >價格搜尋</h1>
-
+  <div class="container">
+    <h1 class="jumbotron bg-primary" style="text-align: center" >價格搜尋</h1>
 
     <!-- Add a search input -->
-        <div style="margin-bottom: 10px;text-align: center">
-            <input type="text" id="searchInput" placeholder="輸入名稱">
-            <button onclick="searchByName()">搜尋</button>
-        </div>
+    <div style="margin-bottom: 10px;text-align: center">
+      <form method="post" action="/search">
+        <input type="text" name="searchInput" id="searchInput" placeholder="輸入名稱">
+   <button type="submit" class="btn btn-success" >搜尋</button>
 
+      </form>
+    </div>
 
     <table class="table table-striped" id="priceTable" style="margin: auto;">
-        <thead>
-            <tr>
-                <th scope="col">名稱</th>
-                <th scope="col">昨日建議售價</th>
-                <th scope="col">今日建議售價</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pri in price %}
-                <tr>
-                    <th>{{pri.name}}</th>
-                    <th>{{pri.price_up}}</th>
-                    <th>{{pri.price_down}}</th>
-                </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th scope="col">名稱</th>
+          <th scope="col">昨日建議價格</th>
+          <th scope="col">今日建議價格</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pri in price %}
+          <tr>
+            <td>{{ pri.name }}</td>
+            <td>{{ pri.price_L1 }}</td>
+            <td>{{ pri.price_L2 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
 
-
-</div>
+    <canvas id="myLineChart" width="400" height="200"></canvas>
     <script>
-       function searchByName() {
-    // 獲取輸入框的值
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById('searchInput');
-    filter = input.value.toUpperCase(); // 將輸入轉為大寫，以不區分大小寫進行搜索
-    table = document.getElementById('priceTable'); // 獲取表格元素
-    tr = table.getElementsByTagName('tr'); // 獲取表格中的所有行
+      // 獲取當前日期
+      var today = new Date();
 
-    // 遍歷表格的每一行
-    for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName('th')[0]; // 獲取每一行的第一個單元格（通常是表頭）
-        if (td) {
-            txtValue = td.textContent || td.innerText; // 獲取表頭單元格的文本內容
-            // 檢查表頭單元格的文本是否包含搜索過濾器
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = ''; // 顯示匹配的行
-            } else {
-                tr[i].style.display = 'none'; // 隱藏不匹配的行
-            }
-        }
-    }
-}
+      // 獲取 L1（今天） 的月份和日期
+      var L1 = (today.getMonth() + 1) + '/' + today.getDate();
 
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      var L2 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
 
-        function navigateToAdmin2() {
-            window.location.href = "/admin";
-        }
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 2);
+      var L3 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 3);
+      var L4 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 4);
+      var L5 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 5);
+      var L6 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+
+      var yesterday = new Date();
+      yesterday.setDate(today.getDate() - 6);
+      var L7 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+
+      // 將資料參數 L1.L2.L3.L4.L5.L6.L7 替換為實際的數據
+      var data = {
+    labels: [L7, L6, L5, L4, L3, L2, L1],
+    datasets: [{
+        label: '過去七天價格走勢圖',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        data: [
+            {% for pri in price %}
+                {{ pri.price_L7 }},
+                {{ pri.price_L6 }},
+                {{ pri.price_L5 }},
+                {{ pri.price_L4 }},
+                {{ pri.price_L3 }},
+                {{ pri.price_L2 }},
+                {{ pri.price_L1 }}
+            {% endfor %}
+        ],
+        fill: false,
+    }]
+};
+
+      var ctx = document.getElementById('myLineChart').getContext('2d');
+
+      var myLineChart = new Chart(ctx, {
+          type: 'line',
+          data: data,
+          options: {
+              scales: {
+                  x: {
+                      type: 'category',
+                      position: 'bottom'
+                  },
+                  y: {
+                      beginAtZero: true
+                  }
+              },
+              plugins: {
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              var label = context.dataset.label || '';
+
+                              if (label) {
+                                  label += ': ';
+                              }
+                              label += context.parsed.y;
+                              return label;
+                          }
+                      }
+                  }
+              }
+          }
+      });
     </script>
+  </div>
+
+  <script>
+    function navigateToAdmin2() {
+      window.location.href = "/";
+    }
+  </script>
 </body>
 </html>

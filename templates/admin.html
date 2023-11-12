@@ -4,29 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>蔬果辨識系統</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 
 <style>
-  h1 {
-    margin-top: 50px;
-  }
+    body {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    transition: background-image 2s ease; /* 添加過渡效果 */
+}
 
+    .container {
+        text-align: center;
+    }
+
+    h1 {
+        margin-top: 100px;
+        font-size: 50px;
+        color: white;
+    }
+
+    .btn {
+        display: block;
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+    .footer-text {
+        font-size: 10px;
+        position: fixed; /* 固定位置 */
+        bottom: 0; /* 距離底部的距離 */
+        right: 0; /* 距離右側的距離 */
+        padding: 5px; /* 可選的填充，根據需要調整 */
+        color: #fff; /* 文字顏色，根據需要調整 */
+    }
 </style>
 
 <body>
-    <div style="text-align: center;">
-    <h1>蔬果辨識系統</h1>
+    <div class="container">
+        <h1>蔬果辨識系統</h1>
+        <button type="button" class="btn btn-outline-secondary" onclick="navigateToSearch()">搜尋</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="navigateToIdentify()">進入辨識</button>
+        <div class="footer-text">價格資料來源:https://amis.afa.gov.tw</div>
     </div>
-    <button type="button" style="display: block; margin: 0 auto; margin-bottom: 10px;" class="btn btn-primary" onclick="navigateToSearch()">搜尋</button>
-    <button type="button" style="display: block; margin: 0 auto;margin-bottom: 10px" class="btn btn-primary" onclick="navigateToIdentify()">進入辨識</button>
-    <button type="button" style="display: block; margin: 0 auto;" class="btn btn-primary" onclick="navigateToIdentify2()">時時辨識</button>
-</body>
-<script>
-    // 其他 JavaScript 代碼...
 
+    <script>
+    var images = ['static/AA.jpg', 'static/BB.jpg', 'static/CC.jpg', 'static/DD.jpg', 'static/EE.jpg']; // 圖片數組
+    var index = 0; // 當前顯示的圖片索引
+
+    function preloadImage(url) {
+        var img = new Image();
+        img.src = url;
+    }
+
+    function changeBackground() {
+        var nextIndex = (index + 1) % images.length;
+        preloadImage(images[nextIndex]); // 預先載入下一張圖片
+        document.body.style.backgroundImage = 'url(' + images[index] + ')';
+        index = nextIndex; // 更新當前顯示的圖片索引
+        setTimeout(changeBackground, 5000); // 5秒後切換下一張圖片
+    }
+
+    // 初始設置
+    preloadImage(images[1]); // 預先載入第一張圖片
+    changeBackground();
+
+
+
+        /*
+    var images = [
+        '{{ url_for("static", filename="AA.jpg") }}',
+        '{{ url_for("static", filename="BB.jpg") }}',
+        '{{ url_for("static", filename="CC.jpg") }}',
+        '{{ url_for("static", filename="DD.jpg") }}',
+        '{{ url_for("static", filename="EE.jpg") }}'
+    ];
+
+    var index = 0;
+
+    function changeBackground() {
+        $('body').fadeOut(800, function () {
+            $(this).css('background-image', 'url(' + images[index] + ')').fadeIn(800);
+        });
+
+        index = (index + 1) % images.length;
+    }
+
+    // 初始時設定第一張圖片
+    $('body').css('background-image', 'url(' + images[index] + ')');
+
+    // 設定定時器，每隔一段時間切換圖片
+    setInterval(changeBackground, 5000);
+*/
     function navigateToIdentify() {
         window.location.href = "/identify";
     }
@@ -34,9 +106,9 @@
     function navigateToSearch() {
         window.location.href = "/search";
     }
-    function navigateToIdentify2() {
-    window.location.href = "/canmera";
-}
+
 </script>
+
+</body>
 
 </html>
