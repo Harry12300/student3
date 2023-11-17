@@ -6,6 +6,10 @@ from flask_socketio import SocketIO
 from keras.models import load_model
 import keras.utils as image
 import numpy as np
+from openai import OpenAI
+from flask import Flask, render_template, request, jsonify
+import openai_test
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -169,8 +173,25 @@ def get_output():
 
         price = Price2.query.filter_by(id=p).first()
 
-        return render_template("identify.html", prediction=p, img_path=img_path, price=price)
+        return render_template("identify.html",
+                               prediction=p, img_path=img_path, price=price)
 ####################################################
+
+#######################食譜############################
+
+@app.route("/food", methods=['GET', 'POST'])
+def food():
+    if request.method == "POST":
+        prompt = request.form['prompt']
+        ai_answer = openai_test.get_open_ai_api_chat_response(prompt)
+        return jsonify({'ai_answer': ai_answer})
+    return render_template('food.html')
+
+
+
+
+###################################################
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5050)

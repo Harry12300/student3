@@ -135,7 +135,7 @@ for row in sheet.iter_rows(min_row=1, min_col=2, max_col=3):
 
 # 保存修改后的工作簿
 workbook.save(output_file)
-print("数据已四舍五入并保存回 output.xlsx")
+print("資料處理完成")
 
 ##################
 
@@ -160,7 +160,6 @@ for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=
 
 # 保存修改后的工作簿
 workbook.save(output_file)
-print("已在A列之后插入一列，并复制A列的数据到新列")
 
 ####################
 
@@ -192,7 +191,6 @@ for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=2, max_col=
 sheet.delete_cols(4)
 # 保存修改后的工作簿
 workbook.save(output_file)
-print("已处理A列和B列的数据")
 
 ###
 
@@ -215,7 +213,7 @@ with open(output_csv, 'w', newline='', encoding='utf-8') as csv_file:
         cleaned_row = [str(cell).strip() for cell in row]
         csv_writer.writerow(cleaned_row)
 
-print(f"数据已保存为 {output_csv}")
+print(f"已轉為 {output_csv}")
 
 import os
 

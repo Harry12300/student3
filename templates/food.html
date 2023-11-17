@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+    <title>Food Query</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<style>
+    /* 添加樣式來框住 div */
+    .frame {
+        border: 2px solid #8E8E8E;
+        padding: 10px;
+        margin: 10px;
+        background-color: #F0F0F0	;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+    .chat {
+    text-align: right; /* 将内容靠右对齐 */
+    font-size: 10px; /* 设置字体大小为5像素 */
+}
+
+
+  </style>
+
+<body>
+    <button style="margin: 10px;" type="button" class="btn btn-primary" onclick="navigateToAdmin2()">回首頁</button>
+    <div class="container">
+        <h1 class="jumbotron bg-primary" style="text-align: center" >智能食譜</h1>
+
+        <!-- Add a search input -->
+        <div style="margin-bottom: 10px;text-align: center">
+        <form id="food-form">
+            <input type="text" name="prompt" placeholder="輸入蔬菜">
+            <button type="submit" class="btn btn-success" style="" >搜尋</button>
+        </form>
+    </div>
+
+      <div class="frame">
+        <div id="result"></div>
+        </div>
+        <div class="chat">*此產生內容由ChatGPT提供*</div>
+    <script>
+        $(document).ready(function() {
+            $('#food-form').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/food',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('#result').html(data.ai_answer);
+                    }
+                });
+            });
+        });
+        function navigateToAdmin2() {
+            window.location.href = "/";
+}
+    </script>
+</body>
+</html>

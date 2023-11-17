@@ -45,10 +45,13 @@
 
 <body>
     <div class="container">
-        <h1>蔬果辨識系統</h1>
-        <button type="button" class="btn btn-outline-secondary" onclick="navigateToSearch()">搜尋</button>
-        <button type="button" class="btn btn-outline-secondary" onclick="navigateToIdentify()">進入辨識</button>
-        <div class="footer-text">價格資料來源:https://amis.afa.gov.tw</div>
+        <h1>蔬菜辨識系統</h1>
+        <div>
+           <button type="button" class="btn btn-outline-secondary" onclick="navigateToSearch()">價格搜尋</button>
+           <button type="button" class="btn btn-outline-secondary" onclick="navigateToIdentify()">蔬菜辨識</button>
+           <button type="button" class="btn btn-outline-secondary" onclick="food()">智能食譜</button>
+        </div>
+    <div class="footer-text">價格資料來源:https://amis.afa.gov.tw</div>
     </div>
 
     <script>
@@ -65,40 +68,13 @@
         preloadImage(images[nextIndex]); // 預先載入下一張圖片
         document.body.style.backgroundImage = 'url(' + images[index] + ')';
         index = nextIndex; // 更新當前顯示的圖片索引
-        setTimeout(changeBackground, 5000); // 5秒後切換下一張圖片
+        setTimeout(changeBackground, 3000); // 5秒後切換下一張圖片
     }
 
     // 初始設置
     preloadImage(images[1]); // 預先載入第一張圖片
     changeBackground();
 
-
-
-        /*
-    var images = [
-        '{{ url_for("static", filename="AA.jpg") }}',
-        '{{ url_for("static", filename="BB.jpg") }}',
-        '{{ url_for("static", filename="CC.jpg") }}',
-        '{{ url_for("static", filename="DD.jpg") }}',
-        '{{ url_for("static", filename="EE.jpg") }}'
-    ];
-
-    var index = 0;
-
-    function changeBackground() {
-        $('body').fadeOut(800, function () {
-            $(this).css('background-image', 'url(' + images[index] + ')').fadeIn(800);
-        });
-
-        index = (index + 1) % images.length;
-    }
-
-    // 初始時設定第一張圖片
-    $('body').css('background-image', 'url(' + images[index] + ')');
-
-    // 設定定時器，每隔一段時間切換圖片
-    setInterval(changeBackground, 5000);
-*/
     function navigateToIdentify() {
         window.location.href = "/identify";
     }
@@ -106,7 +82,9 @@
     function navigateToSearch() {
         window.location.href = "/search";
     }
-
+    function food() {
+        window.location.href = "/food";
+    }
 </script>
 
 </body>

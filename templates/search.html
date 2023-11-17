@@ -9,6 +9,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
 </head>
+
 <body>
   <button style="margin: 10px;" type="button" class="btn btn-primary" onclick="navigateToAdmin2()">回首頁</button>
 
@@ -19,119 +20,212 @@
     <div style="margin-bottom: 10px;text-align: center">
       <form method="post" action="/search">
         <input type="text" name="searchInput" id="searchInput" placeholder="輸入名稱">
-   <button type="submit" class="btn btn-success" >搜尋</button>
+<button type="submit" class="btn btn-success" style="height: 30px;">搜尋</button>
 
       </form>
     </div>
 
-    <table class="table table-striped" id="priceTable" style="margin: auto;">
-      <thead>
-        <tr>
-          <th scope="col">名稱</th>
-          <th scope="col">昨日建議價格</th>
-          <th scope="col">今日建議價格</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for pri in price %}
-          <tr>
-            <td>{{ pri.name }}</td>
-            <td>{{ pri.price_L1 }}</td>
-            <td>{{ pri.price_L2 }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<table class="table table-striped" id="priceTable" style="margin: auto;">
+  <thead>
+    <tr>
+      <th scope="col">名稱</th>
+      <th scope="col">昨日建議價</th>
+      <th scope="col">今日建議價</th>
+      <th scope="col">查看圖表</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pri in price %}
+      <tr>
+        <td>{{ pri.name }}</td>
+        <td>{{ pri.price_L2 }}</td>
+        <td>{{ pri.price_L1 }}</td>
+        <td>
+          <button class="btn btn-outline-secondary" onclick="showChart('{{ pri.name }}', '{{ pri.price_L7 }}', '{{ pri.price_L6 }}', '{{ pri.price_L5 }}',
+            '{{ pri.price_L4 }}', '{{ pri.price_L3 }}', '{{ pri.price_L2 }}', '{{ pri.price_L1 }}')">顯示圖表</button>
+          <div id="chartContainer_{{ pri.name }}"></div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 
     <canvas id="myLineChart" width="400" height="200"></canvas>
     <script>
       // 獲取當前日期
-      var today = new Date();
 
-      // 獲取 L1（今天） 的月份和日期
-      var L1 = (today.getMonth() + 1) + '/' + today.getDate();
+    function generateChartData() {
+        // 獲取當前日期
+        var today = new Date();
+        var L1 = (today.getMonth() + 1) + '/' + today.getDate();
+        var L2 = (today.getMonth() + 1) + '/' + (today.getDate()-1);
+        var L3 = (today.getMonth() + 1) + '/' + (today.getDate()-2);
+        var L4 = (today.getMonth() + 1) + '/' + (today.getDate()-3);
+        var L5 = (today.getMonth() + 1) + '/' + (today.getDate()-4);
+        var L6 = (today.getMonth() + 1) + '/' + (today.getDate()-5);
+        var L7 = (today.getMonth() + 1) + '/' + (today.getDate()-6);
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 1);
-      var L2 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+        // 將資料參數 L1.L2.L3.L4.L5.L6.L7 替換為實際的數據
+        var data = {
+            labels: [L7, L6, L5, L4, L3, L2, L1],
+            datasets: [{
+                label: '過去七天價格走勢圖',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                data: [
+                    {% for pri in price %}
+                        {{ pri.price_L7 }},
+                        {{ pri.price_L6 }},
+                        {{ pri.price_L5 }},
+                        {{ pri.price_L4 }},
+                        {{ pri.price_L3 }},
+                        {{ pri.price_L2 }},
+                        {{ pri.price_L1 }}
+                    {% endfor %}
+                ],
+                fill: false,
+            }]
+        };
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 2);
-      var L3 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+        var ctx = document.getElementById('myLineChart').getContext('2d');
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 3);
-      var L4 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        type: 'category',
+                        position: 'bottom'
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 4);
-      var L5 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 5);
-      var L6 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
+    // 呼叫函數以生成圖表
+    generateChartData();
+</script>
 
-      var yesterday = new Date();
-      yesterday.setDate(today.getDate() - 6);
-      var L7 = (yesterday.getMonth() + 1) + '/' + yesterday.getDate();
-
-      // 將資料參數 L1.L2.L3.L4.L5.L6.L7 替換為實際的數據
-      var data = {
-    labels: [L7, L6, L5, L4, L3, L2, L1],
-    datasets: [{
-        label: '過去七天價格走勢圖',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        data: [
-            {% for pri in price %}
-                {{ pri.price_L7 }},
-                {{ pri.price_L6 }},
-                {{ pri.price_L5 }},
-                {{ pri.price_L4 }},
-                {{ pri.price_L3 }},
-                {{ pri.price_L2 }},
-                {{ pri.price_L1 }}
-            {% endfor %}
-        ],
-        fill: false,
-    }]
-};
-
-      var ctx = document.getElementById('myLineChart').getContext('2d');
-
-      var myLineChart = new Chart(ctx, {
-          type: 'line',
-          data: data,
-          options: {
-              scales: {
-                  x: {
-                      type: 'category',
-                      position: 'bottom'
-                  },
-                  y: {
-                      beginAtZero: true
-                  }
-              },
-              plugins: {
-                  tooltip: {
-                      callbacks: {
-                          label: function(context) {
-                              var label = context.dataset.label || '';
-
-                              if (label) {
-                                  label += ': ';
-                              }
-                              label += context.parsed.y;
-                              return label;
-                          }
-                      }
-                  }
-              }
-          }
-      });
-    </script>
   </div>
 
   <script>
+
+  var chartVisible = false;  // 新增狀態變數，初始值為false
+function toggleChart(name, priceL7, priceL6, priceL5, priceL4, priceL3, priceL2, priceL1) {
+  var containerId = 'chartContainer_' + name;
+  var container = document.getElementById(containerId);
+
+  if (chartVisible) {
+    // 如果圖表可見，則隱藏它
+    container.innerHTML = '';
+    chartVisible = false;
+  } else {
+    // 如果圖表不可見，則顯示它
+    // ...（原本的生成圖表的程式碼）
+
+    // 更新狀態變數
+    chartVisible = true;
+  }
+}
+function showChart(name, priceL7, priceL6, priceL5, priceL4, priceL3, priceL2, priceL1) {
+    var today = new Date();
+    var L1 = (today.getMonth() + 1) + '/' + today.getDate();
+    var L2 = (today.getMonth() + 1) + '/' + (today.getDate() - 1);
+    var L3 = (today.getMonth() + 1) + '/' + (today.getDate() - 2);
+    var L4 = (today.getMonth() + 1) + '/' + (today.getDate() - 3);
+    var L5 = (today.getMonth() + 1) + '/' + (today.getDate() - 4);
+    var L6 = (today.getMonth() + 1) + '/' + (today.getDate() - 5);
+    var L7 = (today.getMonth() + 1) + '/' + (today.getDate() - 6);
+
+    // 在按鈕下方動態插入折線圖
+    var containerId = 'chartContainer_' + name;
+    var container = document.getElementById(containerId);
+
+    // 检查图表容器的可见性
+    var isChartVisible = container.style.display !== 'none';
+
+    if (isChartVisible) {
+        // 如果图表可见，则隐藏
+        container.style.display = 'none';
+    } else {
+        // 如果图表不可见，则显示
+        container.style.display = 'block';
+
+        // 清空之前的內容
+        container.innerHTML = '';
+
+        // 創建canvas元素
+        var canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 150;
+        container.appendChild(canvas);
+
+        // 創建折線圖
+        var ctx = canvas.getContext('2d');
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [L7, L6, L5, L4, L3, L2, L1],
+                datasets: [{
+                    label: '七日價格走勢圖',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: [priceL7, priceL6, priceL5, priceL4, priceL3, priceL2, priceL1],
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'category',
+                        position: 'bottom'
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 更新图表以确保立即显示
+        myLineChart.update();
+    }
+}
+
+
+
+
     function navigateToAdmin2() {
       window.location.href = "/";
     }
