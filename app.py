@@ -143,7 +143,6 @@ category = {
 # 這是訓練好的模型架構你沒有要進行辨識 所以你可以複製就好
 model = load_model('D:/專題/student/model_senior_project_best_clear.h5')
 
-
 def predict_label(img_path):
     try:
         # 實現圖像預處理，例如調整大小、正規化等
@@ -172,13 +171,11 @@ def get_output():
         p = predict_label(img_path)
 
         price = Price2.query.filter_by(id=p).first()
-
+        print(p)
         return render_template("identify.html",
                                prediction=p, img_path=img_path, price=price)
-####################################################
 
 #######################食譜############################
-
 @app.route("/food", methods=['GET', 'POST'])
 def food():
     if request.method == "POST":
@@ -186,11 +183,6 @@ def food():
         ai_answer = openai_test.get_open_ai_api_chat_response(prompt)
         return jsonify({'ai_answer': ai_answer})
     return render_template('food.html')
-
-
-
-
-###################################################
 
 
 if __name__ == '__main__':
